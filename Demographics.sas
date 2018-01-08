@@ -1,9 +1,22 @@
+%macro ODSOff(); /* Call prior to BY-group processing */
+ods graphics off;
+ods exclude all;
+%mend;
+ 
+%macro ODSOn(); /* Call after BY-group processing */
+ods graphics on;
+ods exclude none;
+%mend;
+
+ods exclude all;
 proc datasets library = work;
 	delete table_data;
 run; quit;
+ods exclude none;
+
+data bkd; set cvwoac.cv_analysis_set; run;
 
 options mprint;
-
 %macro tablemaker(var_type = , thing_n=, variable=);
 	%if &var_type. = categorical %then %do;
 		ods output CrossTabs = ct_disp(drop = stddev percent stderr);
@@ -249,47 +262,47 @@ options mprint;
 *var_type identifies type of variable, choices are categorical, dichomatous, non-parametric, ;
 *thing_n orders table;
 *variable determines variable tested;
-%tablemaker(var_type = NP, thing_n = 1, variable = age);
-%tablemaker(var_type = dichotomous, thing_n = 2, variable = female);
-%tablemaker(var_type = categorical, thing_n = 3, variable = pay1);
-%tablemaker(var_type = categorical, thing_n = 4, variable = dispuniform);
-%tablemaker(var_type = dichotomous, thing_n = 5, variable = flag_chf);
-%tablemaker(var_type = dichotomous, thing_n = 6, variable = flag_dm);
-%tablemaker(var_type = dichotomous, thing_n = 7, variable = flag_htn);
-%tablemaker(var_type = dichotomous, thing_n = 8, variable = flag_smk);
-*%tablemaker(var_type = dichotomous, thing_n = 9, variable = flag_strk);
-%tablemaker(var_type = dichotomous, thing_n = 10, variable = flag_vasc);
+%odsoff;
+	%tablemaker(var_type = NP, thing_n = 1, variable = age);
+	%tablemaker(var_type = dichotomous, thing_n = 2, variable = female);
+	%tablemaker(var_type = categorical, thing_n = 3, variable = pay1);
+	%tablemaker(var_type = categorical, thing_n = 4, variable = dispuniform);
+	%tablemaker(var_type = dichotomous, thing_n = 5, variable = flag_chf);
+	%tablemaker(var_type = dichotomous, thing_n = 6, variable = flag_dm);
+	%tablemaker(var_type = dichotomous, thing_n = 7, variable = flag_htn);
+	%tablemaker(var_type = dichotomous, thing_n = 8, variable = flag_smk);
+	*%tablemaker(var_type = dichotomous, thing_n = 9, variable = flag_strk);
+	%tablemaker(var_type = dichotomous, thing_n = 10, variable = flag_vasc);
+	%tablemaker(var_type = dichotomous, thing_n = 10, variable = flag_ckd);
+%odson;
 
 data table_data;
 	set table_data;
 	row_no = _n_;
 run;
 
-ods excel file = "C:\Users\Benjamin\Documents\Okabe Research\Cardioversion without Anticoagulation\Table 1 &time_day..xlsx"
-					style = Dove
-					options(index='on' /*'off'*/
-									sheet_interval='none');
-
-ods excel options(sheet_name = 'Table');
+ods document name = cvwoacr.demographics(write);
+title1 bold justify = left 'Table 1';
+title2 justify = left 'Characteristics of Study Population';
 proc report data = table_data;
 	options missing = '';
-	columns table_row count1 text1 count2 text2 count3 text3 Pvalue table_no thing_no row_no label;
+	columns table_row count1 text1 count2 text2 count3 text3 Pvalue table_no thing_no row_no /*label*/;
 
-	define table_row / display;
-	define count1 / display;
+	define table_row / display 'Characteristic';
+	define count1 / display 'Low Risk' format = 7.0;
 	define text1 / display;
-	define count2 / display;
+	define count2 / display 'Intermediate Risk' format = 7.0;
 	define text2 / display;
-	define count3 / display;
+	define count3 / display 'High Risk' format = 7.0;
 	define text3 / display;
 	define pvalue / display;
-	define table_no / display; *the rub;
-	define thing_no / display;
+	define table_no / noprint; *the rub;
+	define thing_no / noprint;
 	define row_no / noprint order = data;
 
-	compute label;
+	/*compute label;
 		if table_no = 1 then call define(_row_, "style", "style={font_weight=bold}");
-	endcomp;
+	endcomp;*/
 run;
-ods excel close;
+ods document close;
 

@@ -6,6 +6,7 @@ libname nistrend 'C:\Users\Benjamin\Documents\Guha Research\Trend';
 
 libname nrdcore  'C:\NRD\core';
 libname nrdchron 'C:\NRD\chron';
+libname nrdfmt 'C:\NRD\fmts';
 libname nrdhosp  'C:\NRD\hosp';
 libname nrdsev	 'C:\NRD\sev';
 libname ccslib	 'C:\CCS';

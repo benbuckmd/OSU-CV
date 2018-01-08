@@ -1,4 +1,4 @@
-proc sql noprint;
+﻿proc sql noprint;
 	create table fu_post_cv as
   select *
   from nrdcore.core2014
@@ -70,7 +70,7 @@ data fu_post_cv;
  	if substr(dx1,1,3) = '433' then primary_stk_readm = 1;
 		else if substr(dx1,1,3) = '434' then primary_stk_readm = 1;
 		else if substr(dx1,1,4) = '4371' then primary_stk_readm = 1;
-		else if substr(dx1,1,3) = '435' then primary_stk_readm = 1;
+		else if substr(dx1,1,4) = '4359' then primary_stk_readm = 1;
 		else if substr(dx1,1,3) = '444' then primary_stk_readm = 1;
 
 	*Outcome by CCS codes;
@@ -104,7 +104,7 @@ run;
 data pts_rehospd;
 	set work.fu_post_cv;
 	by NRD_VisitLink;
-	retain fu_01_30 fu_31_60 fu_61_90;
+	retain days_of_fu fu_01_30 fu_31_60 fu_61_90; *days is new thing;
 	if first.NRD_VisitLink then do;
 		fu_01_30 = event_flag_01_30;
 		fu_31_60 = event_flag_31_60;
@@ -115,7 +115,7 @@ data pts_rehospd;
 	fu_61_90 = max(fu_61_90, event_flag_61_90);
 	if last.NRD_VisitLink and sum(fu_01_30, fu_31_60, fu_61_90) ge 1 then output;
 
-	keep NRD_VisitLink fu_01_30 fu_31_60 fu_61_90 primary_outcome;
+	keep NRD_VisitLink days_of_fu fu_01_30 fu_31_60 fu_61_90 primary_outcome;
 /*	if sum(fu_01_30, fu_31_60, fu_61_90) ge 1;*/
 run;
 
@@ -126,3 +126,4 @@ run;
 proc datasets lib = work;
 	delete index_cv_and_date;
 run;
+quit;

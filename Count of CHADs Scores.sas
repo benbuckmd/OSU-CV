@@ -1,0 +1,12 @@
+title1 justify = left 't';
+title2 justify = left 't';
+title3 justify = left 't';
+proc surveyfreq data = cvwoac.cv_analysis_set;
+	table index_admit * risk_group / col;
+	format risk_group risk_grp.;
+	cluster HOSP_NRD;
+	strata NRD_STRATUM;
+	weight DISCWT;
+*	where dmonth le 11;
+run;
+*ods document close; 

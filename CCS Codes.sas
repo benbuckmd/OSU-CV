@@ -13,3 +13,4 @@ proc format cntlin = ccsformat_data; run;
 proc datasets library = work;
 	delete ccscode ccsformat_data;
 run;
+quit;
