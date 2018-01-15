@@ -12,7 +12,7 @@ run;
 
 data fu_post_cv;
 	DECLARE Hash fucvs ();
-  	rc = fucvs.DefineKey("nrd_visitlink");
+  	rc = fucvs.DefineKey("nrd_visitlink", "cv_9961", "cv_9962");
   	rc = fucvs.DefineData("index_days");
   	rc = fucvs.DefineDone();
   	DO UNTIL (eof1); *set additional file;
@@ -21,7 +21,7 @@ data fu_post_cv;
   	END;
     DO UNTIL (eof2); *set base file;
       SET fu_post_cv end = eof2;
-	  	call missing(index_days);
+	  	call missing(index_days, cv_9961, cv_9962);
 		  rc = fucvs.find ();
 		  OUTPUT;
     END;

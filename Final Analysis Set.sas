@@ -23,6 +23,8 @@ data cv_analysis_set;
 	dccvin10 = 0;
 	dccvin11 = 0;
 
+	dccv_flag = 0;
+
 	if fu_01_30 = . and dmonth le 11 then fu_01_30 = 0;
 	if fu_31_60 = . and dmonth le 10 then fu_31_60 = 0;
 	if fu_61_90 = . and dmonth le  9 then fu_61_90 = 0;
@@ -37,6 +39,8 @@ data cv_analysis_set;
 	if dmonth le 09 then dccvby09 = 1;
 	if dmonth eq 10 then dccvin10 = 1;
 	if dmonth eq 11 then dccvin11 = 1;
+
+	if cv_9961 = 1 or cv_9962 = 1 then dccv_flag = 1;
 run;
 
 proc copy in = work out = cvwoac;
@@ -44,6 +48,8 @@ proc copy in = work out = cvwoac;
 run;
 
 *Unweighted count of index admissions;
+/*
 proc freq data = cvwoac.cv_analysis_set;
 table fu_01_30 flag_strk;
 run;
+*/

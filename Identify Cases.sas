@@ -1,6 +1,9 @@
-data index_cv;
+﻿data index_cv;
 	af_flag = 0;
 	cv_flag = 0;
+	cv_9961 = 0;
+	cv_9962 = 0;
+	cv_9969 = 0;
 	index_admit = 1;
  	re_admit = 0;
 	set nrdcore.core2014;
@@ -14,12 +17,19 @@ data index_cv;
 		DO over pr;
 			IF substr(pr,1,4) = '9961' or substr(pr,1,4) = '9962' or substr(pr,1,4) = '9969' 
 				THEN cv_flag = 1;
-		END;
+			IF substr(pr,1,4) = '9961'
+				THEN cv_9961 = 1; *Atrial cardioversion;
+			IF substr(pr,1,4) = '9962'
+				THEN cv_9962 = 1; *Other Countershock;
+			IF substr(pr,1,4) = '9969'
+				THEN cv_9969 = 1; *Other Conversion;
+	END;
 
 /*	Inclusion Criteria*/
 	if cv_flag;
 	if af_flag = 1;
 	if dmonth LE 11;
+	if age ge 18;
 	
 run;
 
@@ -44,6 +54,7 @@ data index_cv;
 	flag_ckd = 0;
 
 	*identify other comorbidities;
+	flag_ckd = 0;
 	flag_smk = 0;
 
 	*Calculate CHADS2VASC score and identifiy other comorbidities;
@@ -74,11 +85,6 @@ data index_cv;
 	CHADS2VASc = flag_chf + flag_htn + flag_age + flag_dm + flag_strk + flag_vasc + flag_sex;
 run;
 
-proc freq data = index_cv;
-	table CHADS2VASc;
-	weight discwt;
-run;
-
 data hosp_set;
 	set nrdcore.core2014;
 	by hosp_nrd;
@@ -90,3 +96,10 @@ run;
 proc copy in = work out = cvwoac;
 	select index_cv hosp_set;
 run;
+
+/*
+proc freq data = index_cv;
+	table CHADS2VASc;
+	weight discwt;
+run;
+*/

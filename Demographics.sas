@@ -1,4 +1,4 @@
-%macro ODSOff(); /* Call prior to BY-group processing */
+﻿%macro ODSOff(); /* Call prior to BY-group processing */
 ods graphics off;
 ods exclude all;
 %mend;
@@ -259,22 +259,24 @@ options mprint;
 	%end;
 %mend tablemaker;
 
-*var_type identifies type of variable, choices are categorical, dichomatous, non-parametric, ;
+*var_type identifies type of variable, choices are categorical, dichomatous, non-parametric, normal;
 *thing_n orders table;
 *variable determines variable tested;
 %odsoff;
 	%tablemaker(var_type = NP, thing_n = 1, variable = age);
 	%tablemaker(var_type = dichotomous, thing_n = 2, variable = female);
-	%tablemaker(var_type = categorical, thing_n = 3, variable = pay1);
-	%tablemaker(var_type = categorical, thing_n = 4, variable = dispuniform);
-	%tablemaker(var_type = dichotomous, thing_n = 5, variable = flag_chf);
-	%tablemaker(var_type = dichotomous, thing_n = 6, variable = flag_dm);
-	%tablemaker(var_type = dichotomous, thing_n = 7, variable = flag_htn);
-	%tablemaker(var_type = dichotomous, thing_n = 8, variable = flag_smk);
+	%tablemaker(var_type = dichotomous, thing_n = 3, variable = dccv_flag);
+	%tablemaker(var_type = dichotomous, thing_n = 4, variable = flag_ckd);
+%odson;
+/*	%tablemaker(var_type = categorical, thing_n = 12, variable = pay1);
+	%tablemaker(var_type = categorical, thing_n = 5, variable = dispuniform);
+	%tablemaker(var_type = dichotomous, thing_n = 6, variable = flag_chf);
+	%tablemaker(var_type = dichotomous, thing_n = 7, variable = flag_dm);
+	%tablemaker(var_type = dichotomous, thing_n = 8, variable = flag_htn);
+	%tablemaker(var_type = dichotomous, thing_n = 9, variable = flag_smk);
 	*%tablemaker(var_type = dichotomous, thing_n = 9, variable = flag_strk);
 	%tablemaker(var_type = dichotomous, thing_n = 10, variable = flag_vasc);
-	%tablemaker(var_type = dichotomous, thing_n = 10, variable = flag_ckd);
-%odson;
+	%tablemaker(var_type = dichotomous, thing_n = 11, variable = flag_ckd);*/
 
 data table_data;
 	set table_data;
@@ -306,3 +308,21 @@ proc report data = table_data;
 run;
 ods document close;
 
+/*Experimental*/ /*
+proc freq data = cvwoac.cv_analysis_set;
+table cv_9961 cv_9962 dccv_flag;
+weight discwt;
+run;
+*/
+/*
+		ods output CrossTabs = ct_disp(drop = stddev percent stderr);
+		ods output ChiSq = chi_disp;
+		ods trace on;
+		proc surveyreg data = cvwoac.cv_analysis_set;
+			model age = risk_group;* = age /* &variable. *//*; 
+			weight discwt; 
+			where index_admit = 1;
+			cluster HOSP_NRD;
+			strata NRD_STRATUM;
+		run;
+		ods trace off;*/
